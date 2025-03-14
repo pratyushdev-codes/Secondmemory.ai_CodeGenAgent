@@ -8,3 +8,4 @@ python-dotenv==1.0.1
 mangum
 langchain_google_genai
 pydantic
+Docker 
