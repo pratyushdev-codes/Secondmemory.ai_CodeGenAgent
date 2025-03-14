@@ -37,7 +37,6 @@ code_researcher = Agent(
     ),
     llm=my_llm,
     tools=[githubSearch_tool],
-    allow_delegation=True,
     allow_code_execution=True
 )
 
@@ -52,6 +51,5 @@ code_generator = Agent(
     ),
     llm=my_llm,
     tools=[githubSearch_tool],
-    allow_delegation=True,
     allow_code_execution=True
 )
