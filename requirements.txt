@@ -6,3 +6,5 @@ crewai==0.95.0
 crewai-tools==0.25.8
 python-dotenv==1.0.1
 mangum
+langchain_google_genai
+pydantic
