@@ -10,6 +10,14 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = FastAPI(title="Code Generation Agentic AI")
 # handler = Mangum(app)  # Entry point for AWS Lambda.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  
+    allow_credentials=True,
+    allow_methods=["*"],  
+    allow_headers=["*"],  
+)
+
 @app.get("/")
 async def root():
     """Health check endpoint"""
