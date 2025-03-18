@@ -16,9 +16,11 @@ import os
 from dotenv import load_dotenv
 from crewai_tools import SerperDevTool, WebsiteSearchTool
 load_dotenv()
-os.environ['SERPER_API_KEY'] = os.getenv('SERPER_API_KEY')
+# os.environ['SERPER_API_KEY'] = os.getenv('SERPER_API_KEY')
 
 # inititlaize the tool for internet searching capabilities
+
+SERPER_API_KEY="cf0f0f17b780b3770fb01050b902355a4fc51ffc"
 githubSearch_tool = SerperDevTool()   ##this is just names as github search tool but it is google search tool
 
 web_search_tool=WebsiteSearchTool
