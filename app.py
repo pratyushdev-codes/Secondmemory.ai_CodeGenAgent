@@ -1,14 +1,28 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import uvicorn
 from codegeneration import AgentResponse, CodeAnalysisRequest, run_crew_ai
 import urllib3
-# from mangum import Mangum
+
 # Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 app = FastAPI(title="Code Generation Agentic AI")
+
+# Configure CORS
+origins = [
+    "*"  # You can restrict this to your frontend domain, e.g., "https://yourdomain.com"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],    # Allows all HTTP methods
+    allow_headers=["*"],    # Allows all headers
+)
 
 @app.get("/")
 async def root():
@@ -22,7 +36,6 @@ async def analyze_syntax(request: CodeAnalysisRequest):
     """
     try:
         result = run_crew_ai(request.query, request.code)
-
         return AgentResponse(
             status="success",
             message="Syntax analysis completed",
@@ -40,7 +53,6 @@ async def process_code(request: CodeAnalysisRequest):
     """
     try:
         result = run_crew_ai(request.query, request.code)
-        
         return AgentResponse(
             status="success",
             message="Code analysis completed",
@@ -61,5 +73,4 @@ async def http_exception_handler(request, exc):
     }
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
