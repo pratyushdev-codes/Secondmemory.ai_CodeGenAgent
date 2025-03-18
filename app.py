@@ -1,22 +1,12 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Dict, Any
 import uvicorn
-from codegeneration import AgentResponse, run_crew_ai
+from codegeneration import AgentResponse, CodeAnalysisRequest, run_crew_ai
 import urllib3
-
+# from mangum import Mangum
 # Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-# Create a new request model that matches your frontend
-class CodeRequest(BaseModel):
-    code: str
-    syntax: Optional[str] = None
-
-# Keep your original model for backward compatibility
-class CodeAnalysisRequest(BaseModel):
-    query: str
-    code: str
 
 app = FastAPI(title="Code Generation Agentic AI")
 
@@ -44,14 +34,12 @@ async def analyze_syntax(request: CodeAnalysisRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/code", response_model=AgentResponse)
-async def process_code(request: CodeRequest):
+async def process_code(request: CodeAnalysisRequest):
     """
-    Process code with syntax specification using CrewAI
+    Process code with custom query using CrewAI
     """
     try:
-        # Use the syntax field as the query if provided, otherwise use a default
-        query = request.syntax if request.syntax else "Analyze this code"
-        result = run_crew_ai(query, request.code)
+        result = run_crew_ai(request.query, request.code)
         
         return AgentResponse(
             status="success",
@@ -73,4 +61,5 @@ async def http_exception_handler(request, exc):
     }
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
