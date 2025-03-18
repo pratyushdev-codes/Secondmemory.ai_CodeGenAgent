@@ -1,24 +1,24 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware  # Import CORSMiddleware
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Dict, Any
+from typing import Optional
 import uvicorn
-from codegeneration import AgentResponse, CodeAnalysisRequest, run_crew_ai
+from codegeneration import AgentResponse, run_crew_ai
 import urllib3
 
 # Disable SSL warnings
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-app = FastAPI(title="Code Generation Agentic AI")
+# Create a new request model that matches your frontend
+class CodeRequest(BaseModel):
+    code: str
+    syntax: Optional[str] = None
 
-# Configure CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Allows requests from any origin
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Keep your original model for backward compatibility
+class CodeAnalysisRequest(BaseModel):
+    query: str
+    code: str
+
+app = FastAPI(title="Code Generation Agentic AI")
 
 @app.get("/")
 async def root():
@@ -32,6 +32,7 @@ async def analyze_syntax(request: CodeAnalysisRequest):
     """
     try:
         result = run_crew_ai(request.query, request.code)
+
         return AgentResponse(
             status="success",
             message="Syntax analysis completed",
@@ -43,12 +44,15 @@ async def analyze_syntax(request: CodeAnalysisRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/code", response_model=AgentResponse)
-async def process_code(request: CodeAnalysisRequest):
+async def process_code(request: CodeRequest):
     """
-    Process code with custom query using CrewAI
+    Process code with syntax specification using CrewAI
     """
     try:
-        result = run_crew_ai(request.query, request.code)
+        # Use the syntax field as the query if provided, otherwise use a default
+        query = request.syntax if request.syntax else "Analyze this code"
+        result = run_crew_ai(query, request.code)
+        
         return AgentResponse(
             status="success",
             message="Code analysis completed",
