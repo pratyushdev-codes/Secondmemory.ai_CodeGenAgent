@@ -16,7 +16,7 @@ load_dotenv()
 # )
 
 my_llm = LLM(
-    api_key=os.getenv("AIzaSyCyqPIWLCb2U1kdmfzPtYV_eZIJ4F4vWDw"),
+    api_key=os.getenv("AIzaSyCW-vNoDmtBrkEEKUmUUKP3rl7bs2PhOy8"),
     model="gemini/gemini-1.5-flash",
     temperature=0.7,
     verbose= True,
